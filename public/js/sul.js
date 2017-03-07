@@ -32,19 +32,26 @@
 
   _sul.prototype.request = function (url) {
     var self = this;
-    $.post(self._api_, { long_url: url }, function (data) {
-      if (data.hasOwnProperty('status_code') && data.hasOwnProperty('status_txt')) {
-        if (parseInt(data.status_code) == 200) {
-          self._input_.val(data.short_url).select();
-          return self.alert('Copy your shortened url');
-        } else {
-          self._errormsg_ = data.status_txt;
+    $.ajax({
+      type: 'POST',
+      url: self._api_,
+      data: { long_url: url },
+      success: function(data) {
+        if (data.hasOwnProperty('status_code') && data.hasOwnProperty('status_txt')) {
+          if (parseInt(data.status_code) == 200) {
+            self._input_.val(data.short_url).select();
+            return self.alert('Copy your shortened url');
+          } else {
+            self._errormsg_ = data.status_txt;
+          }
         }
-      }
-      return self.alert(self._errormsg_, true);
-    }).error(function () {
-      return self.alert(self._errormsg_, true);
-    });
+        return self.alert(self._errormsg_, true);
+      },
+      error:function(error){
+        return self.alert(self._errormsg_, true);
+      },
+      dataType: 'json',
+    })
   };
 
   $(function () {
